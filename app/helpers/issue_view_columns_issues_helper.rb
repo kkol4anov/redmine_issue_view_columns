@@ -9,18 +9,25 @@ module IssueViewColumnsIssuesHelper
     # continue here if there are fields defined
     field_values = ""
     s = '<table class="list issues odd-even">'
-
-    # set header - columns names
-    s << content_tag('th style="text-align:left"', l(:field_subject))
+    
+    # Changing structure of the header: to place in <thead> и <tr>, fix syntax of content_tag
+    s << '<thead>'
+    s << '<tr>'
+    s << content_tag('th', '', class: 'checkbox')
+    s << content_tag('th', l(:field_subject), style: 'text-align:left')
+    
     columns_list.each do |column|
       s << content_tag("th", column.caption)
     end
 
     if (Redmine::VERSION::MAJOR >= 4)
-      s << content_tag('th style="text-align:right"', l(:label_actions))
+      s << content_tag('th', l(:label_actions), style: 'text-align:right')
     end
+    s << '</tr>'
+    s << '</thead>'
 
     # set data
+    s << '<tbody>'
     issue_list(issue.descendants.visible.preload(:status, :priority, :tracker, :assigned_to).sort_by(&:lft)) do |child, level|
       css = "issue issue-#{child.id} hascontextmenu #{child.css_classes}"
       css << " idnt idnt-#{level}" if level > 0
@@ -40,6 +47,7 @@ module IssueViewColumnsIssuesHelper
     end
 
     s << field_values
+    s << '</tbody>'
     s << "</table>"
     s.html_safe
   end
@@ -55,17 +63,23 @@ module IssueViewColumnsIssuesHelper
 
     s = '<table class="list issues odd-even">'
 
-    # set header with columns names
-    s << content_tag('th style="text-align:left"', l(:field_subject))
-    s << content_tag('th style="text-align:center"', l(:field_status))
+    # Changing structure of the header: to place in <thead> и <tr>, fix syntax of content_tag
+    s << '<thead>'
+    s << '<tr>'
+    s << content_tag('th', '', class: 'checkbox')
+    s << content_tag('th', l(:field_subject), style: 'text-align:left')
+    s << content_tag('th', l(:field_status), style: 'text-align:center')
 
     columns_list.each do |column|
       next if column.caption == "Status"
       s << content_tag("th", column.caption)
     end
 
-    s << content_tag('th style="text-align:right"', l(:label_actions))
+    s << content_tag('th', l(:label_actions), style: 'text-align:right')
+    s << '</tr>'
+    s << '</thead>'
 
+    s << '<tbody>'
     relations.each do |relation|
       other_issue = relation.other_issue(issue)
       css = "issue hascontextmenu #{other_issue.css_classes}"
@@ -94,6 +108,7 @@ module IssueViewColumnsIssuesHelper
                        id: "relation-#{relation.id}",
                        class: css)
     end
+    s << '</tbody>'
 
     s << "</table>"
     s.html_safe
@@ -120,6 +135,6 @@ module IssueViewColumnsIssuesHelper
       proj_field = available_fields.select { |f| f.name.to_s == field }
       subtask_fields << proj_field[0] if proj_field.count > 0
     end
-    subtask_fields # this should be an array of QueryColumn
+    subtask_fields
   end
 end
