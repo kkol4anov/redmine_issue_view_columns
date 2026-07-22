@@ -17,30 +17,36 @@ module IssueViewColumnsIssuesHelper
     s << content_tag('th', l(:field_subject), style: 'text-align:left')
     
     columns_list.each do |column|
+      next if column.name == :subject || column.name == :tracker
       s << content_tag("th", column.caption)
     end
 
     if (Redmine::VERSION::MAJOR >= 4)
-      s << content_tag('th', l(:label_actions), style: 'text-align:right')
+      s << content_tag('th', '', class: 'buttons') # Empty header instead of l(:label_actions), how it is in the vanilla Redmine
     end
     s << '</tr>'
     s << '</thead>'
 
-    # set data
+    # Children issues table data
     s << '<tbody>'
     issue_list(issue.descendants.visible.preload(:status, :priority, :tracker, :assigned_to).sort_by(&:lft)) do |child, level|
       css = "issue issue-#{child.id} hascontextmenu #{child.css_classes}"
       css << " idnt idnt-#{level}" if level > 0
 
-      field_content = content_tag("td", check_box_tag("ids[]", child.id, false, id: nil), class: "checkbox") +
-                      content_tag("td", link_to_issue(child, project: (issue.project_id != child.project_id)), class: "subject", style: "width: 30%")
+      field_content = content_tag("td", check_box_tag("ids[]", child.id, false, id: nil), class: "checkbox")
+      
+      # FIX: Avoid to reveal "Action" inside a text of a link using cross_project parameters
+      is_cross = (issue.project_id != child.project_id)
+      issue_link = link_to_issue(child, project: is_cross, tracker: true)
+      field_content << content_tag("td", issue_link, class: "subject", style: "width: 30%")
 
       columns_list.each do |column|
+        next if column.name == :subject || column.name == :tracker
         field_content << content_tag("td", column_content(column, child), class: "#{column.css_classes}")
       end
 
       if (Redmine::VERSION::MAJOR >= 4)
-        field_content << content_tag('td', link_to_context_menu, class: 'buttons', style: "text-align:right")
+        field_content << content_tag('td', link_to_context_menu, class: 'buttons')
       end
 
       field_values << content_tag("tr", field_content, class: css).html_safe
@@ -71,11 +77,11 @@ module IssueViewColumnsIssuesHelper
     s << content_tag('th', l(:field_status), style: 'text-align:center')
 
     columns_list.each do |column|
-      next if column.caption == "Status"
+      next if column.name == :status || column.name == :subject || column.name == :tracker
       s << content_tag("th", column.caption)
     end
 
-    s << content_tag('th', l(:label_actions), style: 'text-align:right')
+    s << content_tag('th', '', class: 'buttons') # Empty header fo actions
     s << '</tr>'
     s << '</thead>'
 
@@ -91,20 +97,25 @@ module IssueViewColumnsIssuesHelper
                                         title: l(:label_relation_delete),
                                         class: "icon-only icon-link-break") : ""
 
-      field_content = content_tag("td", check_box_tag("ids[]", other_issue.id, false, id: nil), class: "checkbox") +
-                      content_tag("td", relation.to_s(@issue) { |other| link_to_issue(other, project: Setting.cross_project_issue_relations?) }.html_safe, class: "subject", style: "width: 30%") +
-                      content_tag("td", other_issue.status, class: "status")
+      field_content = content_tag("td", check_box_tag("ids[]", other_issue.id, false, id: nil), class: "checkbox")
+      
+      # FIX: Take pure issue link without core helpers to avoid mess mixing "Action" and "Status" by relation/link_to_issue
+      issue_link = link_to(other_issue.to_s, issue_path(other_issue), class: other_issue.css_classes)
+      field_content << content_tag("td", issue_link, class: "subject", style: "width: 30%")
+      
+      field_content << content_tag("td", other_issue.status.to_s, class: "status")
 
       columns_list.each do |column|
-        next if column.name == :status
+        next if column.name == :status || column.name == :subject || column.name == :tracker
         field_content << content_tag("td", column_content(column, other_issue), class: "#{column.css_classes}")
       end
 
-      buttons = link
+      buttons = link.html_safe
       buttons << link_to_context_menu if Redmine::VERSION::MAJOR >= 4
-      field_content << content_tag('td', buttons, {class: 'buttons', style: 'text-align: right'}, false)
+      
+      field_content << content_tag('td', buttons, class: 'buttons')
 
-      s << content_tag("tr", field_content,
+      s << content_tag("tr", field_content.html_safe,
                        id: "relation-#{relation.id}",
                        class: css)
     end
