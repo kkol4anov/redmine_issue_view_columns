@@ -4,7 +4,7 @@ Redmine::Plugin.register :redmine_issue_view_columns do
   name "Redmine Issue View Columns"
   author "Kenan Dervišević / Konstantin Kolchanov"
   description "Customize shown columns in subtasks and related issues on issue page"
-  version "1.0.3"
+  version "1.0.4"
   url "https://github.com/kenan3008/redmine_issue_view_columns"
 
   project_module :issue_view_columns do

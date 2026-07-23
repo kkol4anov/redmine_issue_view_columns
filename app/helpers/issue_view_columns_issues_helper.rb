@@ -168,7 +168,9 @@ module IssueViewColumnsIssuesHelper
         next
       end
       proj_field = available_fields.select { |f| f.name.to_s == field }
-      subtask_fields << proj_field if proj_field.count > 0
+      
+      # FIX: Extract the first element from the array (.first) so we insert the Column object, not the Array wrapper
+      subtask_fields << proj_field.first if proj_field.count > 0
     end
     subtask_fields
   end
