@@ -40,7 +40,9 @@ $ rake redmine:plugins:migrate RAILS_ENV=production NAME=redmine_issue_view_colu
 $ rake tmp:cache:clear RAILS_ENV=production
 ```
 * Restart redmine:
+```
 $ touch tmp/restart.txt
+```
 
 Credits
 -------
