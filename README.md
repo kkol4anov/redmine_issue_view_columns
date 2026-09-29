@@ -9,11 +9,31 @@ Basic functionality
 
 * Provide configurable list of columns that are shown for subtasks list in issue view
 * Provide configurable list of columns that are shown for related issues in issue view
-* Configuration is possible per project
+* Configuration is possible per project, with optional overrides for each tracker
 * There is a possibility to define global configuration in admin area. Global configuration is then applied to all projects that don't have the plugin module activated.
-* Subject and tracker columns are not configurable by this plugin. This information is always shown, as this is the default behavior of these sections in Redmine
+* Tracker and issue ID are always shown in the first column. Subject is a configurable column.
 * Related issues contain an icon that is used to remove the relation from corresponding ticket. This icon is always shown as the last column on the right side of the related issues table
 * Same configuration is applied to both subtasks and related issues sections
+
+Tracker-specific columns (1.1.0)
+-------------------------------
+
+Settings are selected by the tracker of the **open issue**, not by the trackers
+of individual rows. The same ordered set is used for subtasks and relations,
+even when their rows contain different trackers.
+
+1. Enable the Issue View Columns module in the project.
+2. Open Project settings → Issue columns.
+3. Select “All trackers (project default)” to edit the existing common set.
+4. Select a tracker and click Apply. Clear “Use the project default columns”,
+   choose and order its columns, and save.
+5. Re-enable inheritance and save to remove that tracker's override.
+
+Existing project rows become the common set without losing their order.
+Trackers without an override inherit this set. An explicitly empty set uses
+Redmine's standard table rendering. Projects with the module disabled continue
+to use the global plugin configuration. Tracker overrides are per project.
+Only users with the existing manage_issue_view_columns permission can save.
 
 Compatibility
 -------------

@@ -3,3 +3,6 @@ bs:
   issue_view_columns_settings: "Kolone tiketa"
   label_issue_columns_created_sucessfully: "Kolone uspješno ažurirane"
   label_actions: "Akcija"
+  label_issue_view_columns_all_trackers: "Svi trackeri (zadano za projekat)"
+  label_issue_view_columns_inherit: "Koristi zadane kolone projekta"
+  text_issue_view_columns_tracker_scope: "Tracker otvorenog zadatka određuje kolone za podzadatke i povezane zadatke."

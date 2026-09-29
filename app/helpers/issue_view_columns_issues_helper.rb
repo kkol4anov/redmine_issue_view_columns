@@ -8,7 +8,7 @@ module IssueViewColumnsIssuesHelper
 
     # Continue here if there are custom fields defined
     field_values = "".html_safe
-    s = '<table class="list issues odd-even">'.html_safe
+    s = '<table class="list issues odd-even issue-view-columns">'.html_safe
     
     # Render table header structure (<thead> and <tr>)
     s << '<thead>'.html_safe
@@ -76,7 +76,7 @@ module IssueViewColumnsIssuesHelper
 
     manage_relations = User.current.allowed_to?(:manage_issue_relations, issue.project)
 
-    s = '<table class="list issues odd-even">'.html_safe
+    s = '<table class="list issues odd-even issue-view-columns">'.html_safe
 
     # Render table header structure
     s << '<thead>'.html_safe
@@ -158,7 +158,7 @@ module IssueViewColumnsIssuesHelper
     unless issue.project.module_enabled?(:issue_view_columns)
       all_fields = Setting.plugin_redmine_issue_view_columns["issue_view_default_columns"] || []
     else
-      all_fields = IssueViewColumns.all.select { |c| c.project_id == issue.project_id }.sort_by { |o| o.order }.collect { |f| f.ident } || []
+      all_fields = IssueViewColumns.columns_for(issue.project_id, issue.tracker_id)
     end
 
     all_fields.each do |field|

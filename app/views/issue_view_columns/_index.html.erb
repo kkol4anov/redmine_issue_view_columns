@@ -1,13 +1,31 @@
-<%= stylesheet_link_tag 'issue_view_columns', plugin: "redmine_issue_view_columns", media: 'all'%>
-<%= javascript_include_tag(:'issue_view_default_columns', plugin: "redmine_issue_view_columns") %>
+<%= stylesheet_link_tag 'issue_view_columns', plugin: 'redmine_issue_view_columns', media: 'all' %>
+<%= javascript_include_tag 'issue_view_default_columns', plugin: 'redmine_issue_view_columns' %>
+<% columns_query = build_query_for_project %>
 
-<%= form_tag(update_issue_view_columns_path(nil), method: :post) do %>
+<%= form_tag settings_project_path(@project), method: :get do %>
+  <%= hidden_field_tag 'tab', 'issue_view_columns' %>
+  <p>
+    <%= label_tag 'issue_view_columns_tracker_id', l(:field_tracker) %>
+    <%= select_tag 'tracker_id', options_for_select(
+          [[l(:label_issue_view_columns_all_trackers), '']] + @project.trackers.map { |tracker| [tracker.name, tracker.id] },
+          @issue_view_columns_tracker.try(:id)), id: 'issue_view_columns_tracker_id' %>
+    <%= submit_tag l(:button_apply), name: nil %>
+  </p>
+<% end %>
+
+<%= form_tag update_issue_view_columns_path, method: :post, class: 'issue-view-columns-settings' do %>
   <%= hidden_field_tag 'project_id', @project.id %>
-  <fieldset class="box">
-    <legend> <%= l(:label_select_columns) %> </legend>
-    <%= render_query_columns_selection(build_query_for_project) %>
+  <%= hidden_field_tag 'tracker_id', @issue_view_columns_tracker.try(:id) %>
+  <% if @issue_view_columns_tracker %>
+    <p>
+      <%= check_box_tag 'inherit_columns', '1', @issue_view_columns_inherit %>
+      <%= label_tag 'inherit_columns', l(:label_issue_view_columns_inherit) %>
+    </p>
+  <% end %>
+  <p class="info"><%= l(:text_issue_view_columns_tracker_scope) %></p>
+  <fieldset class="box issue-view-columns-fields">
+    <legend><%= l(:label_select_columns) %></legend>
+    <%= render_query_columns_selection(columns_query) %>
   </fieldset>
-
-  <%= submit_tag t(:button_save) -%>
-  <%= submit_tag t(:button_cancel) -%>
+  <%= submit_tag l(:button_save) %>
 <% end %>
