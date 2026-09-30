@@ -20,9 +20,10 @@ module IssueViewColumnsIssuesHelper
     # Dynamic columns from the plugin (including Subject in the order defined by admin)
     columns_list.each do |column|
       next if column.name == :tracker
-      s << content_tag("th", column.caption)
+      s << content_tag("th", column.caption, class: column.css_classes)
     end
 
+    s << content_tag('th', '', class: 'ivc-spacer', 'aria-hidden' => 'true')
     if (Redmine::VERSION::MAJOR >= 4)
       s << content_tag('th', '', class: 'buttons') # Empty header for the context menu
     end
@@ -47,13 +48,14 @@ module IssueViewColumnsIssuesHelper
         
         if column.name == :subject
           # If it's a Subject column, render it as plain text while keeping the 'subject' class for CSS compatibility
-          field_content << content_tag("td", child.subject, class: "subject", style: "text-align:left;")
+          field_content << content_tag("td", content_tag("span", child.subject, class: "ivc-subject-text"), class: "subject", style: "text-align:left;")
         else
           # Use standard content helper for all other columns
           field_content << content_tag("td", column_content(column, child), class: "#{column.css_classes}")
         end
       end
 
+      field_content << content_tag('td', '', class: 'ivc-spacer', 'aria-hidden' => 'true')
       if (Redmine::VERSION::MAJOR >= 4)
         field_content << content_tag('td', link_to_context_menu, class: 'buttons')
       end
@@ -85,16 +87,12 @@ module IssueViewColumnsIssuesHelper
     # First base column — always an issue link (Tracker #ID)
     s << content_tag('th', l(:label_issue), style: 'text-align:left')
     
-    # Status is rendered second by default in vanilla Redmine, but if the admin added it 
-    # to the plugin list, we exclude it here to avoid duplication.
-    has_status_in_plugin = columns_list.any? { |c| c.name == :status }
-    s << content_tag('th', l(:field_status), style: 'text-align:center') unless has_status_in_plugin
-
     columns_list.each do |column|
       next if column.name == :tracker
-      s << content_tag("th", column.caption)
+      s << content_tag("th", column.caption, class: column.css_classes)
     end
 
+    s << content_tag('th', '', class: 'ivc-spacer', 'aria-hidden' => 'true')
     s << content_tag('th', '', class: 'buttons') # Empty header for actions
     s << '</tr>'.html_safe
     s << '</thead>'.html_safe
@@ -119,20 +117,18 @@ module IssueViewColumnsIssuesHelper
       issue_link = link_to_issue(other_issue, tracker: true, subject: false)
       field_content << content_tag("td", issue_link, class: "id", style: "text-align:left; white-space: nowrap;")
       
-      # 2. Status column (unless it is managed dynamically by the plugin further down)
-      field_content << content_tag("td", other_issue.status.to_s, class: "status") unless has_status_in_plugin
-
-      # 3. Dynamic columns from the plugin (including Subject)
+      # 2. Dynamic columns in the same order as the subtasks table
       columns_list.each do |column|
         next if column.name == :tracker
         
         if column.name == :subject
-          field_content << content_tag("td", other_issue.subject, class: "subject", style: "text-align:left;")
+          field_content << content_tag("td", content_tag("span", other_issue.subject, class: "ivc-subject-text"), class: "subject", style: "text-align:left;")
         else
           field_content << content_tag("td", column_content(column, other_issue), class: "#{column.css_classes}")
         end
       end
 
+      field_content << content_tag('td', '', class: 'ivc-spacer', 'aria-hidden' => 'true')
       buttons = "".html_safe
       buttons << link.html_safe if link.present?
       buttons << link_to_context_menu if Redmine::VERSION::MAJOR >= 4

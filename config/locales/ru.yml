@@ -1,6 +1,6 @@
 ru:
   label_select_columns: "Поля подзадач и связанных задач"
-  issue_view_columns_settings: "Поля задач"
+  issue_view_columns_settings: "Поля подзадач и связанных задач"
   label_issue_columns_created_sucessfully: "Набор полей сохранён"
   label_actions: "Действие"
   label_issue_view_columns_all_trackers: "Все трекеры (общие настройки проекта)"

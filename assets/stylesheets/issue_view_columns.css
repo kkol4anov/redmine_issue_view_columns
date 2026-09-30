@@ -15,3 +15,54 @@
 .issue-view-columns-settings fieldset:disabled {
     opacity: 0.6;
 }
+
+/* Keep data compact; only the spacer absorbs unused table width. */
+#content table.list.issues.issue-view-columns {
+    width: 100%;
+    table-layout: auto;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th,
+#content table.list.issues.issue-view-columns > tbody > tr > td {
+    width: 1%;
+    white-space: nowrap;
+    padding-right: 8px;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th.ivc-spacer,
+#content table.list.issues.issue-view-columns > tbody > tr > td.ivc-spacer {
+    width: auto;
+    padding: 0;
+}
+
+/* Intrinsic width follows the longest subject, up to a readable line length. */
+#content table.list.issues.issue-view-columns .ivc-subject-text {
+    display: inline-block;
+    max-width: 42rem;
+    max-width: min(42rem, 50vw);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th.subject {
+    text-align: left;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th.done_ratio,
+#content table.list.issues.issue-view-columns > tbody > tr > td.done_ratio {
+    text-align: center;
+}
+
+/* Scope to the nested progress table, not the outer issue table. */
+#content table.list.issues.issue-view-columns td.done_ratio table.progress {
+    width: 80px;
+    float: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#content table.list.issues.issue-view-columns > tbody > tr > td.buttons {
+    text-align: right;
+    padding-right: 0;
+}
