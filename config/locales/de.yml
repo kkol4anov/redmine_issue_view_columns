@@ -3,3 +3,6 @@ de:
   issue_view_columns_settings: "Ausgabespalten"
   label_issue_columns_created_sucessfully: "Spalten erfolgreich aktualisiert"
   label_actions: "Aktion"
+  label_issue_view_columns_all_trackers: "Alle Tracker (Projektstandard)"
+  label_issue_view_columns_inherit: "Standardspalten des Projekts verwenden"
+  text_issue_view_columns_tracker_scope: "Der Tracker des geöffneten Tickets bestimmt die Spalten für Unteraufgaben und zugehörige Tickets."

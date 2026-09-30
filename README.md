@@ -9,11 +9,38 @@ Basic functionality
 
 * Provide configurable list of columns that are shown for subtasks list in issue view
 * Provide configurable list of columns that are shown for related issues in issue view
-* Configuration is possible per project
-* There is a possibility to define global configuration in admin area. Global configuration is then applied to all projects that don't have the plugin module activated.
-* Subject and tracker columns are not configurable by this plugin. This information is always shown, as this is the default behavior of these sections in Redmine
+* Configuration is possible per project, with optional overrides for each tracker
+* Global defaults are inherited by projects with the plugin module enabled. Disabled projects use Redmine's original tables.
+* Tracker and issue ID are always shown in the first column. Subject is a configurable column.
 * Related issues contain an icon that is used to remove the relation from corresponding ticket. This icon is always shown as the last column on the right side of the related issues table
 * Same configuration is applied to both subtasks and related issues sections
+
+Tracker-specific columns (1.1.0)
+-------------------------------
+
+Settings are selected by the tracker of the **open issue**, not by the trackers
+of individual rows. The same ordered set is used for subtasks and relations,
+even when their rows contain different trackers.
+
+1. Enable the Issue View Columns module in the project.
+2. Open Project settings → Issue columns.
+3. Select “All trackers (project default)” to edit the existing common set.
+4. Select a tracker and click Apply. Clear “Use the project default columns”,
+   choose and order its columns, and save.
+5. Re-enable inheritance and save to remove that tracker's override.
+
+Existing nonempty project sets and tracker overrides keep their order.
+In “All trackers”, “Use global settings” is enabled by default when no local
+set is stored, and disables the fields selector below. Tracker inheritance
+uses the effective project set, including its inherited global settings.
+Saving an empty project/tracker set restores inheritance.
+
+Global settings use Subject, Status, % Done, Start date when empty or unset.
+“Reset to default columns” restores these four fields in order; click Save
+to persist the reset. Clearing the global list also uses these defaults.
+The plugin only renders tables in projects where its module is enabled.
+Disabling the module preserves saved column settings for later reactivation.
+Only users with the existing manage_issue_view_columns permission can save.
 
 Compatibility
 -------------

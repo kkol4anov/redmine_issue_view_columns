@@ -1,21 +1,15 @@
 <%= stylesheet_link_tag 'issue_view_columns', plugin: "redmine_issue_view_columns", media: 'all'%>
 <%= javascript_include_tag(:'issue_view_default_columns', plugin: "redmine_issue_view_columns") %>
 
-<fieldset class="box">
-  <legend>Select default columns for issue's subtasks and related issues:</legend>
+<fieldset class="box" id="issue-view-columns-global-settings">
+  <legend><%= l(:label_select_columns) %></legend>
+    <%= hidden_field_tag 'settings[issue_view_default_columns][]', '' %>
     <%= render_query_columns_selection(
-            IssueQuery.new(:column_names => Setting.plugin_redmine_issue_view_columns["issue_view_default_columns"]),
+            IssueQuery.new(:column_names => IssueViewColumns.global_columns),
             :name => 'settings[issue_view_default_columns]') %>
+  <p>
+    <%= button_tag l(:button_issue_view_columns_reset), type: 'button', id: 'issue-view-columns-reset',
+                   data: { columns: IssueViewColumns::DEFAULT_COLUMNS } %>
+  </p>
+  <p class="info"><%= l(:text_issue_view_columns_defaults) %></p>
 </fieldset>
-
-<style>
-.tabular.settings label {
-    margin-left: 0px !important;
-    font-weight: bold !important;
-}
-
-.tabular label {
-    text-align: right !important;
-    float: none !important;
-}
-</style>

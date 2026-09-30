@@ -3,10 +3,124 @@
 #available_c,
 #selected_c {
     width: 250px !important;
+    max-width: 100%;
 }
 
-@media screen and (max-width: 799px) {
-    table.list.issues>tbody>tr:first-child {
-        display: none;
-    }
+/* Warm brown-beige, darker than Redmine's pale issue background. */
+#content table.list.issues.issue-view-columns > thead > tr > th {
+    background: #ffffff00;
+    border-bottom: 0.5px solid #dddddd;
+}
+
+.issue-view-columns-settings fieldset:disabled {
+    opacity: 0.6;
+}
+
+/* Pack data columns on the left; only the spacer absorbs unused width. */
+#content table.list.issues.issue-view-columns {
+    width: 100%;
+    table-layout: auto;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th:not(.subject):not(.parent-subject):not(.ivc-spacer):not(.buttons),
+#content table.list.issues.issue-view-columns > tbody > tr > td:not(.subject):not(.parent-subject):not(.ivc-spacer):not(.buttons) {
+    width: 1%;
+    white-space: nowrap;
+    padding-right: 16px;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th.subject,
+#content table.list.issues.issue-view-columns > thead > tr > th.parent-subject,
+#content table.list.issues.issue-view-columns > tbody > tr > td.subject,
+#content table.list.issues.issue-view-columns > tbody > tr > td.parent-subject {
+    /* JS supplies the natural width; auto layout can shrink it to fit. */
+    width: auto;
+    max-width: none;
+    box-sizing: border-box;
+    padding-right: 16px;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: manual;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th.ivc-spacer,
+#content table.list.issues.issue-view-columns > tbody > tr > td.ivc-spacer {
+    width: auto;
+    padding: 0;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th.subject {
+    text-align: center;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th.done_ratio,
+#content table.list.issues.issue-view-columns > tbody > tr > td.done_ratio {
+    text-align: center;
+}
+
+/* Scope to the nested progress table, not the outer issue table. */
+#content table.list.issues.issue-view-columns td.done_ratio table.progress {
+    width: 80px;
+    float: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#content table.list.issues.issue-view-columns > thead > tr > th.buttons,
+#content table.list.issues.issue-view-columns > tbody > tr > td.buttons {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+    padding-right: 0;
+}
+
+/* The column picker has labels above its lists, not a separate label column. */
+#issue-view-columns-global-settings label {
+    display: block;
+    float: none;
+    width: auto;
+    margin-left: 0;
+    text-align: left;
+    font-weight: bold;
+}
+
+#issue-view-columns-global-settings > p {
+    margin: 8px 0 0;
+    padding: 0;
+    min-height: 0;
+}
+
+/* Keep both lists and their arrow controls together on narrow screens. */
+#issue-view-columns-global-settings .query-columns {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* Measure unwrapped content off screen, without changing the visible table. */
+#content table.list.issues.issue-view-columns.ivc-measuring {
+    position: absolute !important;
+    visibility: hidden !important;
+    pointer-events: none;
+    left: -100000px;
+    top: 0;
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+#content table.issue-view-columns.ivc-measuring th,
+#content table.issue-view-columns.ivc-measuring td {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+#content table.issue-view-columns.ivc-measuring th,
+#content table.issue-view-columns.ivc-measuring td,
+#content table.issue-view-columns.ivc-measuring th *,
+#content table.issue-view-columns.ivc-measuring td * {
+    white-space: nowrap !important;
 }

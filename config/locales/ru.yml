@@ -1,0 +1,11 @@
+ru:
+  label_select_columns: "Поля подзадач и связанных задач"
+  issue_view_columns_settings: "Поля подзадач и связанных задач"
+  label_issue_columns_created_sucessfully: "Набор полей сохранён"
+  label_actions: "Действие"
+  label_issue_view_columns_all_trackers: "Все трекеры (общие настройки проекта)"
+  label_issue_view_columns_inherit: "Использовать общий набор полей проекта"
+  text_issue_view_columns_tracker_scope: "Набор полей определяется трекером открытой задачи и применяется к таблицам подзадач и связанных задач."
+  label_issue_view_columns_inherit_global: "Использовать глобальные настройки"
+  button_issue_view_columns_reset: "Сбросить на набор по умолчанию"
+  text_issue_view_columns_defaults: "По умолчанию: Тема, Статус, Готовность, Дата начала. Пустой список также использует этот набор."

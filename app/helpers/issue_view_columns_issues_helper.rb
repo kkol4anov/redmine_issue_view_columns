@@ -1,5 +1,7 @@
 module IssueViewColumnsIssuesHelper
   def render_descendants_tree(issue)
+    return super unless issue.project.module_enabled?(:issue_view_columns)
+
     columns_list = get_fields_for_project(issue)
     # No fields defined, use default rendering from core Redmine (or other plugins loaded earlier)
     unless columns_list.count > 0
@@ -8,7 +10,7 @@ module IssueViewColumnsIssuesHelper
 
     # Continue here if there are custom fields defined
     field_values = "".html_safe
-    s = '<table class="list issues odd-even">'.html_safe
+    s = '<table class="list issues odd-even issue-view-columns">'.html_safe
     
     # Render table header structure (<thead> and <tr>)
     s << '<thead>'.html_safe
@@ -20,9 +22,10 @@ module IssueViewColumnsIssuesHelper
     # Dynamic columns from the plugin (including Subject in the order defined by admin)
     columns_list.each do |column|
       next if column.name == :tracker
-      s << content_tag("th", column.caption)
+      s << content_tag("th", column.caption, class: column.css_classes)
     end
 
+    s << content_tag('th', '', class: 'ivc-spacer', 'aria-hidden' => 'true')
     if (Redmine::VERSION::MAJOR >= 4)
       s << content_tag('th', '', class: 'buttons') # Empty header for the context menu
     end
@@ -47,13 +50,14 @@ module IssueViewColumnsIssuesHelper
         
         if column.name == :subject
           # If it's a Subject column, render it as plain text while keeping the 'subject' class for CSS compatibility
-          field_content << content_tag("td", child.subject, class: "subject", style: "text-align:left;")
+          field_content << content_tag("td", content_tag("span", child.subject, class: "ivc-subject-text"), class: "subject", style: "text-align:left;")
         else
           # Use standard content helper for all other columns
           field_content << content_tag("td", column_content(column, child), class: "#{column.css_classes}")
         end
       end
 
+      field_content << content_tag('td', '', class: 'ivc-spacer', 'aria-hidden' => 'true')
       if (Redmine::VERSION::MAJOR >= 4)
         field_content << content_tag('td', link_to_context_menu, class: 'buttons')
       end
@@ -69,6 +73,8 @@ module IssueViewColumnsIssuesHelper
 
   # Renders the list of related issues on the issue details view
   def render_issue_relations(issue, relations)
+    return super unless issue.project.module_enabled?(:issue_view_columns)
+
     columns_list = get_fields_for_project(issue)
     unless columns_list.count > 0
       return super
@@ -76,7 +82,7 @@ module IssueViewColumnsIssuesHelper
 
     manage_relations = User.current.allowed_to?(:manage_issue_relations, issue.project)
 
-    s = '<table class="list issues odd-even">'.html_safe
+    s = '<table class="list issues odd-even issue-view-columns">'.html_safe
 
     # Render table header structure
     s << '<thead>'.html_safe
@@ -85,16 +91,12 @@ module IssueViewColumnsIssuesHelper
     # First base column — always an issue link (Tracker #ID)
     s << content_tag('th', l(:label_issue), style: 'text-align:left')
     
-    # Status is rendered second by default in vanilla Redmine, but if the admin added it 
-    # to the plugin list, we exclude it here to avoid duplication.
-    has_status_in_plugin = columns_list.any? { |c| c.name == :status }
-    s << content_tag('th', l(:field_status), style: 'text-align:center') unless has_status_in_plugin
-
     columns_list.each do |column|
       next if column.name == :tracker
-      s << content_tag("th", column.caption)
+      s << content_tag("th", column.caption, class: column.css_classes)
     end
 
+    s << content_tag('th', '', class: 'ivc-spacer', 'aria-hidden' => 'true')
     s << content_tag('th', '', class: 'buttons') # Empty header for actions
     s << '</tr>'.html_safe
     s << '</thead>'.html_safe
@@ -119,20 +121,18 @@ module IssueViewColumnsIssuesHelper
       issue_link = link_to_issue(other_issue, tracker: true, subject: false)
       field_content << content_tag("td", issue_link, class: "id", style: "text-align:left; white-space: nowrap;")
       
-      # 2. Status column (unless it is managed dynamically by the plugin further down)
-      field_content << content_tag("td", other_issue.status.to_s, class: "status") unless has_status_in_plugin
-
-      # 3. Dynamic columns from the plugin (including Subject)
+      # 2. Dynamic columns in the same order as the subtasks table
       columns_list.each do |column|
         next if column.name == :tracker
         
         if column.name == :subject
-          field_content << content_tag("td", other_issue.subject, class: "subject", style: "text-align:left;")
+          field_content << content_tag("td", content_tag("span", other_issue.subject, class: "ivc-subject-text"), class: "subject", style: "text-align:left;")
         else
           field_content << content_tag("td", column_content(column, other_issue), class: "#{column.css_classes}")
         end
       end
 
+      field_content << content_tag('td', '', class: 'ivc-spacer', 'aria-hidden' => 'true')
       buttons = "".html_safe
       buttons << link.html_safe if link.present?
       buttons << link_to_context_menu if Redmine::VERSION::MAJOR >= 4
@@ -155,11 +155,7 @@ module IssueViewColumnsIssuesHelper
     available_fields = query.available_inline_columns
     subtask_fields = []
 
-    unless issue.project.module_enabled?(:issue_view_columns)
-      all_fields = Setting.plugin_redmine_issue_view_columns["issue_view_default_columns"] || []
-    else
-      all_fields = IssueViewColumns.all.select { |c| c.project_id == issue.project_id }.sort_by { |o| o.order }.collect { |f| f.ident } || []
-    end
+    all_fields = IssueViewColumns.columns_for(issue.project_id, issue.tracker_id)
 
     all_fields.each do |field|
       # Exclude ONLY tracker, as it is displayed inside the first column as part of the link text.
@@ -171,6 +167,12 @@ module IssueViewColumnsIssuesHelper
       
       # FIX: Extract the first element from the array (.first) so we insert the Column object, not the Array wrapper
       subtask_fields << proj_field.first if proj_field.count > 0
+    end
+    # Removed/unavailable custom fields must not silently disable the plugin.
+    if subtask_fields.empty?
+      subtask_fields = IssueViewColumns::DEFAULT_COLUMNS.map do |name|
+        available_fields.find { |column| column.name.to_s == name }
+      end.compact
     end
     subtask_fields
   end
