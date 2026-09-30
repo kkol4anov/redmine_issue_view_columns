@@ -16,24 +16,32 @@
     opacity: 0.6;
 }
 
-/* Keep other data compact; subject sizing and wrapping belong to Redmine. */
+/* Pack data columns on the left; only the spacer absorbs unused width. */
 #content table.list.issues.issue-view-columns {
     width: 100%;
     table-layout: auto;
 }
 
-#content table.list.issues.issue-view-columns > thead > tr > th:not(.subject),
-#content table.list.issues.issue-view-columns > tbody > tr > td:not(.subject, .parent-subject) {
+#content table.list.issues.issue-view-columns > thead > tr > th:not(.subject):not(.parent-subject):not(.ivc-spacer):not(.buttons),
+#content table.list.issues.issue-view-columns > tbody > tr > td:not(.subject):not(.parent-subject):not(.ivc-spacer):not(.buttons) {
     width: 1%;
     white-space: nowrap;
     padding-right: 16px;
 }
 
+#content table.list.issues.issue-view-columns > thead > tr > th.subject,
+#content table.list.issues.issue-view-columns > thead > tr > th.parent-subject,
 #content table.list.issues.issue-view-columns > tbody > tr > td.subject,
 #content table.list.issues.issue-view-columns > tbody > tr > td.parent-subject {
+    /* JS supplies the natural width; auto layout can shrink it to fit. */
     width: auto;
+    max-width: none;
+    box-sizing: border-box;
     padding-right: 16px;
+    white-space: normal;
     word-break: normal;
+    overflow-wrap: normal;
+    hyphens: manual;
 }
 
 #content table.list.issues.issue-view-columns > thead > tr > th.ivc-spacer,
@@ -59,7 +67,10 @@
     margin-right: auto;
 }
 
+#content table.list.issues.issue-view-columns > thead > tr > th.buttons,
 #content table.list.issues.issue-view-columns > tbody > tr > td.buttons {
+    width: 1%;
+    white-space: nowrap;
     text-align: right;
     padding-right: 0;
 }
@@ -86,4 +97,30 @@
     max-width: 100%;
     overflow-x: auto;
     white-space: nowrap;
+}
+
+/* Measure unwrapped content off screen, without changing the visible table. */
+#content table.list.issues.issue-view-columns.ivc-measuring {
+    position: absolute !important;
+    visibility: hidden !important;
+    pointer-events: none;
+    left: -100000px;
+    top: 0;
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+#content table.issue-view-columns.ivc-measuring th,
+#content table.issue-view-columns.ivc-measuring td {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+#content table.issue-view-columns.ivc-measuring th,
+#content table.issue-view-columns.ivc-measuring td,
+#content table.issue-view-columns.ivc-measuring th *,
+#content table.issue-view-columns.ivc-measuring td * {
+    white-space: nowrap !important;
 }
