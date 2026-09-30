@@ -16,14 +16,12 @@
 <%= form_tag update_issue_view_columns_path, method: :post, class: 'issue-view-columns-settings' do %>
   <%= hidden_field_tag 'project_id', @project.id %>
   <%= hidden_field_tag 'tracker_id', @issue_view_columns_tracker.try(:id) %>
-  <% if @issue_view_columns_tracker %>
-    <p>
-      <%= check_box_tag 'inherit_columns', '1', @issue_view_columns_inherit %>
-      <%= label_tag 'inherit_columns', l(:label_issue_view_columns_inherit) %>
-    </p>
-  <% end %>
+  <p>
+    <%= check_box_tag 'inherit_columns', '1', @issue_view_columns_inherit %>
+    <%= label_tag 'inherit_columns', l(@issue_view_columns_tracker ? :label_issue_view_columns_inherit : :label_issue_view_columns_inherit_global) %>
+  </p>
   <p class="info"><%= l(:text_issue_view_columns_tracker_scope) %></p>
-  <fieldset class="box issue-view-columns-fields">
+  <fieldset class="box issue-view-columns-fields" <%= 'disabled="disabled"'.html_safe if @issue_view_columns_inherit %>>
     <legend><%= l(:label_select_columns) %></legend>
     <%= render_query_columns_selection(columns_query) %>
   </fieldset>

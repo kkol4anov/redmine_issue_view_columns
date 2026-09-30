@@ -4,6 +4,9 @@ class IssueViewColumnsTest < ActiveSupport::TestCase
   fixtures :projects, :trackers
 
   def setup
+    Setting.stubs(:plugin_redmine_issue_view_columns).returns(
+      'issue_view_default_columns' => %w[subject status done_ratio start_date]
+    )
     @project = Project.find(1)
     @tracker = Tracker.first
     IssueViewColumns.where(project_id: @project.id).delete_all
@@ -29,9 +32,9 @@ class IssueViewColumnsTest < ActiveSupport::TestCase
     assert_equal %w[subject status], IssueViewColumns.columns_for(@project.id, @tracker.id)
   end
 
-  def test_empty_override_does_not_inherit_project_columns
+  def test_empty_tracker_override_inherits_project_columns
     IssueViewColumns.replace_columns!(@project, @tracker.id, [])
-    assert_equal [IssueViewColumns::EMPTY_COLUMNS], IssueViewColumns.columns_for(@project.id, @tracker.id)
+    assert_equal %w[subject status], IssueViewColumns.columns_for(@project.id, @tracker.id)
   end
 
   def test_subject_is_saved_and_tracker_is_excluded
@@ -53,4 +56,46 @@ class IssueViewColumnsTest < ActiveSupport::TestCase
     end
     assert_equal %w[subject status], IssueViewColumns.configured_columns(@project.id)
   end
+
+  def test_project_without_rows_inherits_global_columns
+    IssueViewColumns.where(project_id: @project.id).delete_all
+    assert_equal IssueViewColumns::DEFAULT_COLUMNS, IssueViewColumns.columns_for(@project.id, @tracker.id)
+  end
+
+  def test_project_inheritance_preserves_tracker_override
+    IssueViewColumns.replace_columns!(@project, @tracker.id, ['assigned_to'])
+    IssueViewColumns.replace_columns!(@project, nil, ['priority'], inherit: true)
+    assert_empty IssueViewColumns.configured_columns(@project.id)
+    assert_equal IssueViewColumns::DEFAULT_COLUMNS, IssueViewColumns.columns_for(@project.id)
+    assert_equal ['assigned_to'], IssueViewColumns.columns_for(@project.id, @tracker.id)
+  end
+
+  def test_empty_project_set_inherits_global_columns
+    IssueViewColumns.replace_columns!(@project, nil, [])
+    assert_empty IssueViewColumns.configured_columns(@project.id)
+    assert_equal IssueViewColumns::DEFAULT_COLUMNS, IssueViewColumns.columns_for(@project.id)
+  end
+
+  def test_legacy_empty_marker_inherits_global_columns
+    IssueViewColumns.where(project_id: @project.id).delete_all
+    IssueViewColumns.create!(project_id: @project.id, tracker_id: nil, ident: '#', order: 1)
+    assert_empty IssueViewColumns.configured_columns(@project.id)
+    assert_equal IssueViewColumns::DEFAULT_COLUMNS, IssueViewColumns.columns_for(@project.id)
+  end
+
+  def test_empty_global_settings_use_plugin_defaults
+    [nil, [], [''], ['#'], ['tracker']].each do |columns|
+      Setting.stubs(:plugin_redmine_issue_view_columns).returns('issue_view_default_columns' => columns)
+      assert_equal %w[subject status done_ratio start_date], IssueViewColumns.global_columns
+    end
+  end
+
+  def test_global_order_is_preserved_and_changes_flow_to_inheriting_trackers
+    IssueViewColumns.replace_columns!(@project, nil, [], inherit: true)
+    Setting.stubs(:plugin_redmine_issue_view_columns).returns('issue_view_default_columns' => %w[priority subject])
+    assert_equal %w[priority subject], IssueViewColumns.columns_for(@project.id, @tracker.id)
+    Setting.stubs(:plugin_redmine_issue_view_columns).returns('issue_view_default_columns' => %w[start_date status])
+    assert_equal %w[start_date status], IssueViewColumns.columns_for(@project.id, @tracker.id)
+  end
+
 end

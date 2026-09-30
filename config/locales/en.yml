@@ -6,3 +6,6 @@ en:
   label_issue_view_columns_all_trackers: "All trackers (project default)"
   label_issue_view_columns_inherit: "Use the project default columns"
   text_issue_view_columns_tracker_scope: "Columns are selected by the tracker of the open issue, for both subtasks and related issues."
+  label_issue_view_columns_inherit_global: "Use global settings"
+  button_issue_view_columns_reset: "Reset to default columns"
+  text_issue_view_columns_defaults: "Defaults: Subject, Status, % Done, Start date. An empty list also uses these defaults. Click Save after resetting."

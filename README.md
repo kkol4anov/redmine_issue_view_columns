@@ -10,7 +10,7 @@ Basic functionality
 * Provide configurable list of columns that are shown for subtasks list in issue view
 * Provide configurable list of columns that are shown for related issues in issue view
 * Configuration is possible per project, with optional overrides for each tracker
-* There is a possibility to define global configuration in admin area. Global configuration is then applied to all projects that don't have the plugin module activated.
+* Global defaults are inherited by projects with the plugin module enabled. Disabled projects use Redmine's original tables.
 * Tracker and issue ID are always shown in the first column. Subject is a configurable column.
 * Related issues contain an icon that is used to remove the relation from corresponding ticket. This icon is always shown as the last column on the right side of the related issues table
 * Same configuration is applied to both subtasks and related issues sections
@@ -29,10 +29,17 @@ even when their rows contain different trackers.
    choose and order its columns, and save.
 5. Re-enable inheritance and save to remove that tracker's override.
 
-Existing project rows become the common set without losing their order.
-Trackers without an override inherit this set. An explicitly empty set uses
-Redmine's standard table rendering. Projects with the module disabled continue
-to use the global plugin configuration. Tracker overrides are per project.
+Existing nonempty project sets and tracker overrides keep their order.
+In “All trackers”, “Use global settings” is enabled by default when no local
+set is stored, and disables the fields selector below. Tracker inheritance
+uses the effective project set, including its inherited global settings.
+Saving an empty project/tracker set restores inheritance.
+
+Global settings use Subject, Status, % Done, Start date when empty or unset.
+“Reset to default columns” restores these four fields in order; click Save
+to persist the reset. Clearing the global list also uses these defaults.
+The plugin only renders tables in projects where its module is enabled.
+Disabling the module preserves saved column settings for later reactivation.
 Only users with the existing manage_issue_view_columns permission can save.
 
 Compatibility
