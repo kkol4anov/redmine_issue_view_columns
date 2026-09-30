@@ -1,7 +1,7 @@
 <%= stylesheet_link_tag 'issue_view_columns', plugin: "redmine_issue_view_columns", media: 'all'%>
 <%= javascript_include_tag(:'issue_view_default_columns', plugin: "redmine_issue_view_columns") %>
 
-<fieldset class="box">
+<fieldset class="box" id="issue-view-columns-global-settings">
   <legend><%= l(:label_select_columns) %></legend>
     <%= hidden_field_tag 'settings[issue_view_default_columns][]', '' %>
     <%= render_query_columns_selection(
@@ -13,15 +13,3 @@
   </p>
   <p class="info"><%= l(:text_issue_view_columns_defaults) %></p>
 </fieldset>
-
-<style>
-.tabular.settings label {
-    margin-left: 0px !important;
-    font-weight: bold !important;
-}
-
-.tabular label {
-    text-align: right !important;
-    float: none !important;
-}
-</style>
