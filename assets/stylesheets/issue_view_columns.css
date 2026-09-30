@@ -23,10 +23,17 @@
 }
 
 #content table.list.issues.issue-view-columns > thead > tr > th:not(.subject),
-#content table.list.issues.issue-view-columns > tbody > tr > td:not(.subject) {
+#content table.list.issues.issue-view-columns > tbody > tr > td:not(.subject, .parent-subject) {
     width: 1%;
     white-space: nowrap;
     padding-right: 16px;
+}
+
+#content table.list.issues.issue-view-columns > tbody > tr > td.subject,
+#content table.list.issues.issue-view-columns > tbody > tr > td.parent-subject {
+    width: auto;
+    padding-right: 16px;
+    word-break: normal;
 }
 
 #content table.list.issues.issue-view-columns > thead > tr > th.ivc-spacer,
