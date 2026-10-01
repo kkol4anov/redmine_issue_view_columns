@@ -17,6 +17,7 @@ module IssueViewColumnsIssuesHelper
     s << '<tr>'.html_safe
     
     # First base column — always an issue link (Tracker #ID) to maintain table structure
+    s << content_tag('th', '', class: 'checkbox')
     s << content_tag('th', l(:label_issue), style: 'text-align:left')
     
     # Dynamic columns from the plugin (including Subject in the order defined by admin)
@@ -41,6 +42,7 @@ module IssueViewColumnsIssuesHelper
       field_content = "".html_safe
       
       # 1. Render the link in "Tracker #ID" format (without subject inside the link text) in the first cell
+      field_content << content_tag('td', check_box_tag('ids[]', child.id, false, id: nil), class: 'checkbox')
       issue_link = link_to_issue(child, tracker: true, subject: false)
       field_content << content_tag("td", issue_link, class: "id", style: "text-align:left; white-space: nowrap;")
 
@@ -89,6 +91,7 @@ module IssueViewColumnsIssuesHelper
     s << '<tr>'.html_safe
     
     # First base column — always an issue link (Tracker #ID)
+    s << content_tag('th', '', class: 'checkbox')
     s << content_tag('th', l(:label_issue), style: 'text-align:left')
     
     columns_list.each do |column|
@@ -118,6 +121,7 @@ module IssueViewColumnsIssuesHelper
       field_content = "".html_safe
       
       # 1. Base link to the issue in "Tracker #ID" format (without subject inside the link text)
+      field_content << content_tag('td', check_box_tag('ids[]', other_issue.id, false, id: nil), class: 'checkbox')
       issue_link = link_to_issue(other_issue, tracker: true, subject: false)
       field_content << content_tag("td", issue_link, class: "id", style: "text-align:left; white-space: nowrap;")
       

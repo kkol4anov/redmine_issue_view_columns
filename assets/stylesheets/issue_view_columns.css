@@ -16,6 +16,12 @@
     opacity: 0.6;
 }
 
+/* Redmine's context menu submits checked ids[] from each selected row. */
+#content table.issue-view-columns > thead > tr > th.checkbox,
+#content table.issue-view-columns > tbody > tr > td.checkbox {
+    display: none;
+}
+
 /* Pack data columns on the left; only the spacer absorbs unused width. */
 #content table.list.issues.issue-view-columns {
     width: 100%;
